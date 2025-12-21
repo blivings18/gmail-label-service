@@ -4,3 +4,7 @@ spring:
 
 server:
   port: 8080
+
+google:
+  oauth:
+    credential-user-id: default-user
