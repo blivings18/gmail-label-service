@@ -1,3 +1,6 @@
 spring:
   application:
     name: gmail-label-service
+
+server:
+  port: 8080
