@@ -1,8 +1,10 @@
 package com.blivings18.gmail.labelservice.service;
 
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
@@ -15,21 +17,26 @@ import com.google.api.client.util.store.FileDataStoreFactory;
 
 @Service
 public class GoogleOAuthService {
-
+    private static final String GOOGLE_CREDS_FILE = "/google-credentials.json";
+    private static final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
     private static final List<String> SCOPES = List.of(
-            "https://www.googleapis.com/auth/gmail.labels"
+        "https://www.googleapis.com/auth/gmail.labels"
     );
 
-    // Use GsonFactory instead of JacksonFactory
-    private static final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
-
     public GoogleAuthorizationCodeFlow authorizationCodeFlow() throws Exception {
+        InputStream credentialsStream = Optional
+            .ofNullable(getClass().getResourceAsStream(GOOGLE_CREDS_FILE))
+            .orElseThrow(() -> new IllegalStateException(
+                String.format(
+                    "Missing src/main/resources%s. " +
+                    "Copy google-credentials.example.json and fill in your OAuth credentials.",
+                    GOOGLE_CREDS_FILE
+                )
+            ));
 
         GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(
-                JSON_FACTORY,
-                new InputStreamReader(
-                        getClass().getResourceAsStream("/google-credentials.json")
-                )
+            JSON_FACTORY,
+            new InputStreamReader(credentialsStream)
         );
 
         return new GoogleAuthorizationCodeFlow.Builder(
@@ -39,9 +46,7 @@ public class GoogleOAuthService {
                 SCOPES
         )
         .setDataStoreFactory(
-                new FileDataStoreFactory(
-                        Paths.get("tokens").toFile()
-                )
+            new FileDataStoreFactory(Paths.get("tokens").toFile())
         )
         .setAccessType("offline")
         .build();

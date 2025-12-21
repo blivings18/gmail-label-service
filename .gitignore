@@ -34,3 +34,4 @@ build/
 
 ### Google API ### 
 tokens/
+src/main/resources/google-credentials.json
