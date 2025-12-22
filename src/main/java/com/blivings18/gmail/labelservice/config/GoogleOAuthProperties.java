@@ -4,24 +4,16 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 import jakarta.annotation.PostConstruct;
+import lombok.Getter;
+import lombok.Setter;
 
 @Component
 @ConfigurationProperties(prefix = "google.oauth")
+@Getter
+@Setter
 public class GoogleOAuthProperties {
-
-    /**
-     * Identifier used to store and retrieve OAuth credentials.
-     * Must remain consistent between authorization and API calls.
-     */
+    private String applicationName;
     private String credentialUserId;
-
-    public String getCredentialUserId() {
-        return credentialUserId;
-    }
-
-    public void setCredentialUserId(String credentialUserId) {
-        this.credentialUserId = credentialUserId;
-    }
 
     @PostConstruct
     public void validate() {

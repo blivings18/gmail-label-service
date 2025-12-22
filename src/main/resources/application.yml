@@ -8,3 +8,4 @@ server:
 google:
   oauth:
     credential-user-id: default-user
+    application-name: gmail-label-service-local
