@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.blivings18.gmail.labelservice.config.GoogleOAuthProperties;
 import com.blivings18.gmail.labelservice.service.GoogleOAuthService;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
 import com.google.api.client.googleapis.auth.oauth2.GoogleTokenResponse;
@@ -17,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class GoogleOAuthController {
     private final GoogleOAuthService oAuthService;
+    private final GoogleOAuthProperties googleOAuthProperties;
 
     @GetMapping("/authorize")
     public void authorize(HttpServletResponse response) throws Exception {
@@ -38,7 +40,7 @@ public class GoogleOAuthController {
                 .setRedirectUri("http://localhost:8080/api/v1/google/oauth/callback")
                 .execute();
 
-        flow.createAndStoreCredential(tokenResponse, "default-user");
+        flow.createAndStoreCredential(tokenResponse, googleOAuthProperties.getCredentialUserId());
 
         return "OAuth successful ✅ You can close this window.";
     }
