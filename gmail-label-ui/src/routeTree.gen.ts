@@ -9,48 +9,55 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as LabelsRouteImport } from './routes/labels'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as AppLabelRouteImport } from './routes/app/label'
 
+const LabelsRoute = LabelsRouteImport.update({
+  id: '/labels',
+  path: '/labels',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AppLabelRoute = AppLabelRouteImport.update({
-  id: '/app/label',
-  path: '/app/label',
-  getParentRoute: () => rootRouteImport,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/app/label': typeof AppLabelRoute
+  '/labels': typeof LabelsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/app/label': typeof AppLabelRoute
+  '/labels': typeof LabelsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/app/label': typeof AppLabelRoute
+  '/labels': typeof LabelsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/app/label'
+  fullPaths: '/' | '/labels'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/app/label'
-  id: '__root__' | '/' | '/app/label'
+  to: '/' | '/labels'
+  id: '__root__' | '/' | '/labels'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AppLabelRoute: typeof AppLabelRoute
+  LabelsRoute: typeof LabelsRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/labels': {
+      id: '/labels'
+      path: '/labels'
+      fullPath: '/labels'
+      preLoaderRoute: typeof LabelsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -58,19 +65,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/app/label': {
-      id: '/app/label'
-      path: '/app/label'
-      fullPath: '/app/label'
-      preLoaderRoute: typeof AppLabelRouteImport
-      parentRoute: typeof rootRouteImport
-    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AppLabelRoute: AppLabelRoute,
+  LabelsRoute: LabelsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
