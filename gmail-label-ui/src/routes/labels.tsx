@@ -1,4 +1,4 @@
-import { queryClient } from '@/QueryClient'
+import { queryClient } from '@/client'
 import { createFileRoute } from '@tanstack/react-router'
 import { LabelsTable } from '../features/labels/LabelsTable'
 import { labelsQueryOptions } from '../features/labels/queryOptions'
