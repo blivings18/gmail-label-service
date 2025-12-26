@@ -44,7 +44,6 @@ This project is currently configured for **local development** using Google OAut
    `https://www.googleapis.com/auth/gmail.labels`
 5. Save and continue
 
-
 ---
 
 ### 4. Create OAuth Credentials
