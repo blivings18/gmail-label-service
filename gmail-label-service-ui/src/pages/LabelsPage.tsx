@@ -13,6 +13,7 @@ import {
 import { DataGrid, GridColDef, GridRowParams } from "@mui/x-data-grid";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import React, { useState } from "react";
+import { Controller, useForm } from "react-hook-form";
 import {
   createLabel,
   deleteLabel,
@@ -21,34 +22,31 @@ import {
   updateLabel,
 } from "../api/labelClient";
 
-const columns: GridColDef<Label>[] = [
-  { field: "name", headerName: "Name", flex: 1 },
-  { field: "type", headerName: "Type", flex: 1 },
-  {
-    field: "labelListVisibility",
-    headerName: "Label Visibility",
-    flex: 1,
-  },
-  {
-    field: "messageListVisibility",
-    headerName: "Message Visibility",
-    flex: 1,
-  },
-];
-
 const typeOptions = ["user", "system"];
 const labelVisibilityOptions = ["labelShow", "labelHide"];
 const messageVisibilityOptions = ["show", "hide"];
 
+interface LabelFormValues {
+  name: string;
+  type: string;
+  labelListVisibility: string;
+  messageListVisibility: string;
+}
+
 const LabelsPage: React.FC = () => {
   const queryClient = useQueryClient();
-
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedLabel, setSelectedLabel] = useState<Label | null>(null);
-  const [nameInput, setNameInput] = useState("");
-  const [typeInput, setTypeInput] = useState("user");
-  const [labelVisibility, setLabelVisibility] = useState("labelShow");
-  const [messageVisibility, setMessageVisibility] = useState("show");
+
+  // react-hook-form
+  const { control, handleSubmit, reset } = useForm<LabelFormValues>({
+    defaultValues: {
+      name: "",
+      type: "user",
+      labelListVisibility: "labelShow",
+      messageListVisibility: "show",
+    },
+  });
 
   // Fetch labels
   const {
@@ -60,23 +58,14 @@ const LabelsPage: React.FC = () => {
     queryFn: fetchLabels,
   });
 
-  // --- Mutations ---
-  const createMutation = useMutation<
-    Label,
-    Error,
-    {
-      name: string;
-      type: string;
-      labelListVisibility: string | null;
-      messageListVisibility: string | null;
-    }
-  >({
-    mutationFn: (variables) =>
+  // Mutations
+  const createMutation = useMutation<Label, Error, LabelFormValues>({
+    mutationFn: (data) =>
       createLabel(
-        variables.name,
-        variables.type,
-        variables.labelListVisibility,
-        variables.messageListVisibility
+        data.name,
+        data.type,
+        data.labelListVisibility,
+        data.messageListVisibility
       ),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["labels"] }),
   });
@@ -84,21 +73,15 @@ const LabelsPage: React.FC = () => {
   const updateMutation = useMutation<
     Label,
     Error,
-    {
-      id: string;
-      name: string;
-      type: string;
-      labelListVisibility: string | null;
-      messageListVisibility: string | null;
-    }
+    LabelFormValues & { id: string }
   >({
-    mutationFn: (variables) =>
+    mutationFn: (data) =>
       updateLabel(
-        variables.id,
-        variables.name,
-        variables.type,
-        variables.labelListVisibility,
-        variables.messageListVisibility
+        data.id,
+        data.name,
+        data.type,
+        data.labelListVisibility,
+        data.messageListVisibility
       ),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["labels"] }),
   });
@@ -108,46 +91,36 @@ const LabelsPage: React.FC = () => {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["labels"] }),
   });
 
-  // --- Handlers ---
+  // Handlers
   const handleRowClick = (params: GridRowParams<Label>) => {
     const row = params.row;
     setSelectedLabel(row);
-    setNameInput(row.name);
-    setTypeInput(row.type);
-    setLabelVisibility(row.labelListVisibility ?? "labelShow");
-    setMessageVisibility(row.messageListVisibility ?? "show");
+    reset({
+      name: row.name,
+      type: row.type,
+      labelListVisibility: row.labelListVisibility ?? "labelShow",
+      messageListVisibility: row.messageListVisibility ?? "show",
+    });
     setDialogOpen(true);
   };
 
   const handleCreateClick = () => {
     setSelectedLabel(null);
-    setNameInput("");
-    setTypeInput("user");
-    setLabelVisibility("labelShow");
-    setMessageVisibility("show");
+    reset({
+      name: "",
+      type: "user",
+      labelListVisibility: "labelShow",
+      messageListVisibility: "show",
+    });
     setDialogOpen(true);
   };
 
-  const handleSave = () => {
-    if (!nameInput.trim()) return;
-
+  const onSubmit = (data: LabelFormValues) => {
     if (selectedLabel) {
-      updateMutation.mutate({
-        id: selectedLabel.id,
-        name: nameInput,
-        type: typeInput,
-        labelListVisibility: labelVisibility,
-        messageListVisibility: messageVisibility,
-      });
+      updateMutation.mutate({ ...data, id: selectedLabel.id });
     } else {
-      createMutation.mutate({
-        name: nameInput,
-        type: typeInput,
-        labelListVisibility: labelVisibility,
-        messageListVisibility: messageVisibility,
-      });
+      createMutation.mutate(data);
     }
-
     setDialogOpen(false);
   };
 
@@ -161,10 +134,6 @@ const LabelsPage: React.FC = () => {
   const handleClose = () => {
     setDialogOpen(false);
     setSelectedLabel(null);
-    setNameInput("");
-    setTypeInput("user");
-    setLabelVisibility("default");
-    setMessageVisibility("default");
   };
 
   if (isLoading) return <CircularProgress />;
@@ -172,6 +141,21 @@ const LabelsPage: React.FC = () => {
     return (
       <Typography color="error">Error loading data: {error.message}</Typography>
     );
+
+  const columns: GridColDef<Label>[] = [
+    { field: "name", headerName: "Name", flex: 1 },
+    { field: "type", headerName: "Type", flex: 1 },
+    {
+      field: "labelListVisibility",
+      headerName: "Label Visibility",
+      flex: 1,
+    },
+    {
+      field: "messageListVisibility",
+      headerName: "Message Visibility",
+      flex: 1,
+    },
+  ];
 
   return (
     <Box sx={{ p: 3 }}>
@@ -199,56 +183,78 @@ const LabelsPage: React.FC = () => {
           {selectedLabel ? "Edit Label" : "Create Label"}
         </DialogTitle>
         <DialogContent>
-          <TextField
-            autoFocus
-            margin="dense"
-            label="Name"
-            fullWidth
-            value={nameInput}
-            onChange={(e) => setNameInput(e.target.value)}
-          />
-          <TextField
-            margin="dense"
-            label="Type"
-            select
-            fullWidth
-            value={typeInput}
-            onChange={(e) => setTypeInput(e.target.value)}
-          >
-            {typeOptions.map((t) => (
-              <MenuItem key={t} value={t}>
-                {t}
-              </MenuItem>
-            ))}
-          </TextField>
-          <TextField
-            margin="dense"
-            label="Label Visibility"
-            select
-            fullWidth
-            value={labelVisibility}
-            onChange={(e) => setLabelVisibility(e.target.value)}
-          >
-            {labelVisibilityOptions.map((v) => (
-              <MenuItem key={v} value={v}>
-                {v}
-              </MenuItem>
-            ))}
-          </TextField>
-          <TextField
-            margin="dense"
-            label="Message Visibility"
-            select
-            fullWidth
-            value={messageVisibility}
-            onChange={(e) => setMessageVisibility(e.target.value)}
-          >
-            {messageVisibilityOptions.map((v) => (
-              <MenuItem key={v} value={v}>
-                {v}
-              </MenuItem>
-            ))}
-          </TextField>
+          <form id="label-form" onSubmit={handleSubmit(onSubmit)}>
+            <Controller
+              name="name"
+              control={control}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  autoFocus
+                  margin="dense"
+                  label="Name"
+                  fullWidth
+                />
+              )}
+            />
+            <Controller
+              name="type"
+              control={control}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  margin="dense"
+                  label="Type"
+                  select
+                  fullWidth
+                >
+                  {typeOptions.map((t) => (
+                    <MenuItem key={t} value={t}>
+                      {t}
+                    </MenuItem>
+                  ))}
+                </TextField>
+              )}
+            />
+            <Controller
+              name="labelListVisibility"
+              control={control}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  margin="dense"
+                  label="Label Visibility"
+                  select
+                  fullWidth
+                >
+                  {labelVisibilityOptions.map((v) => (
+                    <MenuItem key={v} value={v}>
+                      {v}
+                    </MenuItem>
+                  ))}
+                </TextField>
+              )}
+            />
+            <Controller
+              name="messageListVisibility"
+              control={control}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  margin="dense"
+                  label="Message Visibility"
+                  select
+                  fullWidth
+                >
+                  {messageVisibilityOptions.map((v) => (
+                    <MenuItem key={v} value={v}>
+                      {v}
+                    </MenuItem>
+                  ))}
+                </TextField>
+              )}
+            />
+          </form>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>Cancel</Button>
@@ -257,7 +263,7 @@ const LabelsPage: React.FC = () => {
               Delete
             </Button>
           )}
-          <Button variant="contained" onClick={handleSave}>
+          <Button type="submit" form="label-form" variant="contained">
             {selectedLabel ? "Update" : "Create"}
           </Button>
         </DialogActions>
