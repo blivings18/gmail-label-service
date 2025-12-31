@@ -3,5 +3,7 @@ package com.blivings18.gmail.labelservice.domain;
 public record Label(
   String id,
   String name,
-  String type
+  String type,
+  String labelListVisibility,
+  String messageListVisibility
 ) {}
