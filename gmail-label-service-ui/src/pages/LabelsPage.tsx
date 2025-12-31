@@ -1,4 +1,6 @@
 import {
+  Alert,
+  Backdrop,
   Box,
   Button,
   CircularProgress,
@@ -7,6 +9,7 @@ import {
   DialogContent,
   DialogTitle,
   MenuItem,
+  Snackbar,
   TextField,
   Typography,
 } from "@mui/material";
@@ -37,6 +40,10 @@ const LabelsPage: React.FC = () => {
   const queryClient = useQueryClient();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedLabel, setSelectedLabel] = useState<Label | null>(null);
+  const [snackbar, setSnackbar] = useState<{
+    message: string;
+    severity: "success" | "error";
+  } | null>(null);
 
   // react-hook-form
   const { control, handleSubmit, reset } = useForm<LabelFormValues>({
@@ -67,7 +74,16 @@ const LabelsPage: React.FC = () => {
         data.labelListVisibility,
         data.messageListVisibility
       ),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["labels"] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["labels"] });
+      setSnackbar({
+        message: "Label created successfully!",
+        severity: "success",
+      });
+    },
+    onError: (err) => {
+      setSnackbar({ message: err.message, severity: "error" });
+    },
   });
 
   const updateMutation = useMutation<
@@ -83,12 +99,30 @@ const LabelsPage: React.FC = () => {
         data.labelListVisibility,
         data.messageListVisibility
       ),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["labels"] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["labels"] });
+      setSnackbar({
+        message: "Label updated successfully!",
+        severity: "success",
+      });
+    },
+    onError: (err) => {
+      setSnackbar({ message: err.message, severity: "error" });
+    },
   });
 
   const deleteMutation = useMutation<void, Error, { id: string }>({
     mutationFn: (variables) => deleteLabel(variables.id),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["labels"] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["labels"] });
+      setSnackbar({
+        message: "Label deleted successfully!",
+        severity: "success",
+      });
+    },
+    onError: (err) => {
+      setSnackbar({ message: err.message, severity: "error" });
+    },
   });
 
   // Handlers
@@ -136,7 +170,12 @@ const LabelsPage: React.FC = () => {
     setSelectedLabel(null);
   };
 
-  if (isLoading) return <CircularProgress />;
+  if (isLoading)
+    return (
+      <Box display="flex" justifyContent="center" mt={4}>
+        <CircularProgress />
+      </Box>
+    );
   if (error)
     return (
       <Typography color="error">Error loading data: {error.message}</Typography>
@@ -145,17 +184,18 @@ const LabelsPage: React.FC = () => {
   const columns: GridColDef<Label>[] = [
     { field: "name", headerName: "Name", flex: 1 },
     { field: "type", headerName: "Type", flex: 1 },
-    {
-      field: "labelListVisibility",
-      headerName: "Label Visibility",
-      flex: 1,
-    },
+    { field: "labelListVisibility", headerName: "Label Visibility", flex: 1 },
     {
       field: "messageListVisibility",
       headerName: "Message Visibility",
       flex: 1,
     },
   ];
+
+  const isMutationLoading =
+    createMutation.isPending ||
+    updateMutation.isPending ||
+    deleteMutation.isPending;
 
   return (
     <Box sx={{ p: 3 }}>
@@ -178,6 +218,7 @@ const LabelsPage: React.FC = () => {
         />
       </Box>
 
+      {/* Dialog */}
       <Dialog open={dialogOpen} onClose={handleClose} fullWidth maxWidth="sm">
         <DialogTitle>
           {selectedLabel ? "Edit Label" : "Create Label"}
@@ -259,15 +300,56 @@ const LabelsPage: React.FC = () => {
         <DialogActions>
           <Button onClick={handleClose}>Cancel</Button>
           {selectedLabel && (
-            <Button color="error" onClick={handleDelete}>
+            <Button
+              color="error"
+              onClick={handleDelete}
+              disabled={deleteMutation.isPending}
+            >
+              {deleteMutation.isPending && (
+                <CircularProgress size={20} sx={{ mr: 1 }} />
+              )}
               Delete
             </Button>
           )}
-          <Button type="submit" form="label-form" variant="contained">
+          <Button
+            type="submit"
+            form="label-form"
+            variant="contained"
+            disabled={createMutation.isPending || updateMutation.isPending}
+          >
+            {(createMutation.isPending || updateMutation.isPending) && (
+              <CircularProgress size={20} sx={{ mr: 1 }} />
+            )}
             {selectedLabel ? "Update" : "Create"}
           </Button>
         </DialogActions>
       </Dialog>
+
+      {/* Snackbar */}
+      {snackbar && (
+        <Snackbar
+          open
+          autoHideDuration={3000}
+          onClose={() => setSnackbar(null)}
+          anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+        >
+          <Alert
+            onClose={() => setSnackbar(null)}
+            severity={snackbar.severity}
+            sx={{ width: "100%" }}
+          >
+            {snackbar.message}
+          </Alert>
+        </Snackbar>
+      )}
+
+      {/* Optional global Backdrop */}
+      <Backdrop
+        open={isMutationLoading}
+        sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}
+      >
+        <CircularProgress color="inherit" />
+      </Backdrop>
     </Box>
   );
 };
