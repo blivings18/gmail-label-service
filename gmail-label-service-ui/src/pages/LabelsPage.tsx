@@ -6,6 +6,7 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  MenuItem,
   TextField,
   Typography,
 } from "@mui/material";
@@ -22,7 +23,22 @@ import {
 
 const columns: GridColDef<Label>[] = [
   { field: "name", headerName: "Name", flex: 1 },
+  { field: "type", headerName: "Type", flex: 1 },
+  {
+    field: "labelListVisibility",
+    headerName: "Label Visibility",
+    flex: 1,
+  },
+  {
+    field: "messageListVisibility",
+    headerName: "Message Visibility",
+    flex: 1,
+  },
 ];
+
+const typeOptions = ["user", "system"];
+const labelVisibilityOptions = ["labelShow", "labelHide"];
+const messageVisibilityOptions = ["show", "hide"];
 
 const LabelsPage: React.FC = () => {
   const queryClient = useQueryClient();
@@ -30,6 +46,9 @@ const LabelsPage: React.FC = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedLabel, setSelectedLabel] = useState<Label | null>(null);
   const [nameInput, setNameInput] = useState("");
+  const [typeInput, setTypeInput] = useState("user");
+  const [labelVisibility, setLabelVisibility] = useState("labelShow");
+  const [messageVisibility, setMessageVisibility] = useState("show");
 
   // Fetch labels
   const {
@@ -41,18 +60,46 @@ const LabelsPage: React.FC = () => {
     queryFn: fetchLabels,
   });
 
-  // Mutations
-  const createMutation = useMutation<Label, Error, { name: string }>({
-    mutationFn: (variables) => createLabel(variables.name),
+  // --- Mutations ---
+  const createMutation = useMutation<
+    Label,
+    Error,
+    {
+      name: string;
+      type: string;
+      labelListVisibility: string | null;
+      messageListVisibility: string | null;
+    }
+  >({
+    mutationFn: (variables) =>
+      createLabel(
+        variables.name,
+        variables.type,
+        variables.labelListVisibility,
+        variables.messageListVisibility
+      ),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["labels"] }),
   });
 
   const updateMutation = useMutation<
     Label,
     Error,
-    { id: string; name: string }
+    {
+      id: string;
+      name: string;
+      type: string;
+      labelListVisibility: string | null;
+      messageListVisibility: string | null;
+    }
   >({
-    mutationFn: (variables) => updateLabel(variables.id, variables.name),
+    mutationFn: (variables) =>
+      updateLabel(
+        variables.id,
+        variables.name,
+        variables.type,
+        variables.labelListVisibility,
+        variables.messageListVisibility
+      ),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["labels"] }),
   });
 
@@ -61,16 +108,23 @@ const LabelsPage: React.FC = () => {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["labels"] }),
   });
 
-  // Handlers
+  // --- Handlers ---
   const handleRowClick = (params: GridRowParams<Label>) => {
-    setSelectedLabel(params.row);
-    setNameInput(params.row.name);
+    const row = params.row;
+    setSelectedLabel(row);
+    setNameInput(row.name);
+    setTypeInput(row.type);
+    setLabelVisibility(row.labelListVisibility ?? "labelShow");
+    setMessageVisibility(row.messageListVisibility ?? "show");
     setDialogOpen(true);
   };
 
   const handleCreateClick = () => {
     setSelectedLabel(null);
     setNameInput("");
+    setTypeInput("user");
+    setLabelVisibility("labelShow");
+    setMessageVisibility("show");
     setDialogOpen(true);
   };
 
@@ -78,9 +132,20 @@ const LabelsPage: React.FC = () => {
     if (!nameInput.trim()) return;
 
     if (selectedLabel) {
-      updateMutation.mutate({ id: selectedLabel.id, name: nameInput });
+      updateMutation.mutate({
+        id: selectedLabel.id,
+        name: nameInput,
+        type: typeInput,
+        labelListVisibility: labelVisibility,
+        messageListVisibility: messageVisibility,
+      });
     } else {
-      createMutation.mutate({ name: nameInput });
+      createMutation.mutate({
+        name: nameInput,
+        type: typeInput,
+        labelListVisibility: labelVisibility,
+        messageListVisibility: messageVisibility,
+      });
     }
 
     setDialogOpen(false);
@@ -97,6 +162,9 @@ const LabelsPage: React.FC = () => {
     setDialogOpen(false);
     setSelectedLabel(null);
     setNameInput("");
+    setTypeInput("user");
+    setLabelVisibility("default");
+    setMessageVisibility("default");
   };
 
   if (isLoading) return <CircularProgress />;
@@ -119,11 +187,10 @@ const LabelsPage: React.FC = () => {
           rows={labels || []}
           columns={columns}
           getRowId={(row) => row.id}
-          initialState={{
-            pagination: { paginationModel: { pageSize: 10 } },
-          }}
+          initialState={{ pagination: { paginationModel: { pageSize: 10 } } }}
           pageSizeOptions={[10]}
           onRowClick={handleRowClick}
+          disableRowSelectionOnClick
         />
       </Box>
 
@@ -135,11 +202,53 @@ const LabelsPage: React.FC = () => {
           <TextField
             autoFocus
             margin="dense"
-            label="Label Name"
+            label="Name"
             fullWidth
             value={nameInput}
             onChange={(e) => setNameInput(e.target.value)}
           />
+          <TextField
+            margin="dense"
+            label="Type"
+            select
+            fullWidth
+            value={typeInput}
+            onChange={(e) => setTypeInput(e.target.value)}
+          >
+            {typeOptions.map((t) => (
+              <MenuItem key={t} value={t}>
+                {t}
+              </MenuItem>
+            ))}
+          </TextField>
+          <TextField
+            margin="dense"
+            label="Label Visibility"
+            select
+            fullWidth
+            value={labelVisibility}
+            onChange={(e) => setLabelVisibility(e.target.value)}
+          >
+            {labelVisibilityOptions.map((v) => (
+              <MenuItem key={v} value={v}>
+                {v}
+              </MenuItem>
+            ))}
+          </TextField>
+          <TextField
+            margin="dense"
+            label="Message Visibility"
+            select
+            fullWidth
+            value={messageVisibility}
+            onChange={(e) => setMessageVisibility(e.target.value)}
+          >
+            {messageVisibilityOptions.map((v) => (
+              <MenuItem key={v} value={v}>
+                {v}
+              </MenuItem>
+            ))}
+          </TextField>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>Cancel</Button>

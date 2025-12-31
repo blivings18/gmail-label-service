@@ -15,13 +15,34 @@ export const fetchLabels = async (): Promise<Label[]> => {
   return res.data;
 };
 
-export const createLabel = async (name: string): Promise<Label> => {
-  const res = await axios.post(BASE, { name });
+export const createLabel = async (
+  name: string,
+  type: string,
+  labelListVisibility: string | null,
+  messageListVisibility: string | null
+): Promise<Label> => {
+  const res = await axios.post(BASE, {
+    name,
+    type,
+    labelListVisibility,
+    messageListVisibility,
+  });
   return res.data;
 };
 
-export const updateLabel = async (id: string, name: string): Promise<Label> => {
-  const res = await axios.patch(`${BASE}/${id}`, { name });
+export const updateLabel = async (
+  id: string,
+  name: string,
+  type: string,
+  labelListVisibility: string | null,
+  messageListVisibility: string | null
+): Promise<Label> => {
+  const res = await axios.put(`${BASE}/${id}`, {
+    name,
+    type,
+    labelListVisibility,
+    messageListVisibility,
+  });
   return res.data;
 };
 

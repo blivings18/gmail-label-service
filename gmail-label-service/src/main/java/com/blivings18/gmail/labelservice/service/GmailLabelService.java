@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 
 import com.blivings18.gmail.labelservice.converter.GmailLabelConverter;
 import com.blivings18.gmail.labelservice.domain.Label;
-import com.blivings18.gmail.labelservice.dto.CreateLabelDto;
 import com.blivings18.gmail.labelservice.dto.LabelDto;
 import com.google.api.services.gmail.Gmail;
 
@@ -37,14 +36,14 @@ public class GmailLabelService {
                     .toList();
     }
 
-    public LabelDto createLabel(CreateLabelDto dto) throws Exception {
+    public LabelDto createLabel(LabelDto dto) throws Exception {
         Gmail gmail = gmailServiceFactory.createGmailService();
 
         // 1. Build domain object (no ID yet)
         Label domainLabel = new Label(
             null,
             dto.name(),
-            "user",
+            defaultIfNull(dto.type(), "user"),
             defaultIfNull(dto.labelListVisibility(), "labelShow"),
             defaultIfNull(dto.messageListVisibility(), "show")
         );
@@ -66,14 +65,23 @@ public class GmailLabelService {
                 .orElseThrow(() -> new IllegalStateException("Failed to create label"));
     }
 
-   public LabelDto updateLabel(String id, String newName) throws Exception {
+   public LabelDto updateLabel(String id, LabelDto dto) throws Exception {
         Gmail gmail = gmailServiceFactory.createGmailService();
 
-        com.google.api.services.gmail.model.Label label = new com.google.api.services.gmail.model.Label()
-                .setName(newName);
+        Label domainLabel = new Label(
+            id,
+            dto.name(),
+            defaultIfNull(dto.type(), "user"),
+            defaultIfNull(dto.labelListVisibility(), "labelShow"),
+            defaultIfNull(dto.messageListVisibility(), "show")
+        );
+
+        // 2. Convert domain → Gmail model
+        com.google.api.services.gmail.model.Label gmailLabel =
+            GmailLabelConverter.toGmail(domainLabel);
 
         com.google.api.services.gmail.model.Label updatedLabel = 
-            gmail.users().labels().patch("me", id, label).execute();
+            gmail.users().labels().patch("me", id, gmailLabel).execute();
 
         return GmailLabelConverter.toDomain(updatedLabel)
                                   .map(GmailLabelConverter::toDto)
