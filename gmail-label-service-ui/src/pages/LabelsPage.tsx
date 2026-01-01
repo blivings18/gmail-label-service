@@ -9,6 +9,7 @@ import {
   DialogContent,
   DialogTitle,
   MenuItem,
+  Paper,
   Snackbar,
   TextField,
   Typography,
@@ -198,159 +199,153 @@ const LabelsPage: React.FC = () => {
     deleteMutation.isPending;
 
   return (
-    <Box sx={{ p: 3 }}>
-      <Typography variant="h4" gutterBottom>
-        Labels
-      </Typography>
-      <Button variant="contained" onClick={handleCreateClick} sx={{ mb: 2 }}>
-        Create Label
-      </Button>
+    <Paper elevation={2} sx={{ m: 4 }}>
+      <Box sx={{ p: 4 }}>
+        <Button variant="contained" onClick={handleCreateClick} sx={{ mb: 2 }}>
+          Create Label
+        </Button>
 
-      <Box sx={{ height: 650, width: "100%" }}>
-        <DataGrid
-          rows={labels || []}
-          columns={columns}
-          getRowId={(row) => row.id}
-          initialState={{ pagination: { paginationModel: { pageSize: 10 } } }}
-          pageSizeOptions={[10]}
-          onRowClick={handleRowClick}
-          disableRowSelectionOnClick
-        />
-      </Box>
+        <Box sx={{ height: "50vh", width: "100%" }}>
+          <DataGrid
+            rows={labels || []}
+            columns={columns}
+            getRowId={(row) => row.id}
+            onRowClick={handleRowClick}
+            disableRowSelectionOnClick
+          />
+        </Box>
 
-      {/* Dialog */}
-      <Dialog open={dialogOpen} onClose={handleClose} fullWidth maxWidth="sm">
-        <DialogTitle>
-          {selectedLabel ? "Edit Label" : "Create Label"}
-        </DialogTitle>
-        <DialogContent>
-          <form id="label-form" onSubmit={handleSubmit(onSubmit)}>
-            <Controller
-              name="name"
-              control={control}
-              render={({ field }) => (
-                <TextField
-                  {...field}
-                  autoFocus
-                  margin="dense"
-                  label="Name"
-                  fullWidth
-                />
-              )}
-            />
-            <Controller
-              name="type"
-              control={control}
-              render={({ field }) => (
-                <TextField
-                  {...field}
-                  margin="dense"
-                  label="Type"
-                  select
-                  fullWidth
-                >
-                  {typeOptions.map((t) => (
-                    <MenuItem key={t} value={t}>
-                      {t}
-                    </MenuItem>
-                  ))}
-                </TextField>
-              )}
-            />
-            <Controller
-              name="labelListVisibility"
-              control={control}
-              render={({ field }) => (
-                <TextField
-                  {...field}
-                  margin="dense"
-                  label="Label Visibility"
-                  select
-                  fullWidth
-                >
-                  {labelVisibilityOptions.map((v) => (
-                    <MenuItem key={v} value={v}>
-                      {v}
-                    </MenuItem>
-                  ))}
-                </TextField>
-              )}
-            />
-            <Controller
-              name="messageListVisibility"
-              control={control}
-              render={({ field }) => (
-                <TextField
-                  {...field}
-                  margin="dense"
-                  label="Message Visibility"
-                  select
-                  fullWidth
-                >
-                  {messageVisibilityOptions.map((v) => (
-                    <MenuItem key={v} value={v}>
-                      {v}
-                    </MenuItem>
-                  ))}
-                </TextField>
-              )}
-            />
-          </form>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClose}>Cancel</Button>
-          {selectedLabel && (
+        <Dialog open={dialogOpen} onClose={handleClose} fullWidth maxWidth="sm">
+          <DialogTitle>
+            {selectedLabel ? "Edit Label" : "Create Label"}
+          </DialogTitle>
+          <DialogContent>
+            <form id="label-form" onSubmit={handleSubmit(onSubmit)}>
+              <Controller
+                name="name"
+                control={control}
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    autoFocus
+                    margin="dense"
+                    label="Name"
+                    fullWidth
+                  />
+                )}
+              />
+              <Controller
+                name="type"
+                control={control}
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    margin="dense"
+                    label="Type"
+                    select
+                    fullWidth
+                  >
+                    {typeOptions.map((t) => (
+                      <MenuItem key={t} value={t}>
+                        {t}
+                      </MenuItem>
+                    ))}
+                  </TextField>
+                )}
+              />
+              <Controller
+                name="labelListVisibility"
+                control={control}
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    margin="dense"
+                    label="Label Visibility"
+                    select
+                    fullWidth
+                  >
+                    {labelVisibilityOptions.map((v) => (
+                      <MenuItem key={v} value={v}>
+                        {v}
+                      </MenuItem>
+                    ))}
+                  </TextField>
+                )}
+              />
+              <Controller
+                name="messageListVisibility"
+                control={control}
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    margin="dense"
+                    label="Message Visibility"
+                    select
+                    fullWidth
+                  >
+                    {messageVisibilityOptions.map((v) => (
+                      <MenuItem key={v} value={v}>
+                        {v}
+                      </MenuItem>
+                    ))}
+                  </TextField>
+                )}
+              />
+            </form>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleClose}>Cancel</Button>
+            {selectedLabel && (
+              <Button
+                color="error"
+                onClick={handleDelete}
+                disabled={deleteMutation.isPending}
+              >
+                {deleteMutation.isPending && (
+                  <CircularProgress size={20} sx={{ mr: 1 }} />
+                )}
+                Delete
+              </Button>
+            )}
             <Button
-              color="error"
-              onClick={handleDelete}
-              disabled={deleteMutation.isPending}
+              type="submit"
+              form="label-form"
+              variant="contained"
+              disabled={createMutation.isPending || updateMutation.isPending}
             >
-              {deleteMutation.isPending && (
+              {(createMutation.isPending || updateMutation.isPending) && (
                 <CircularProgress size={20} sx={{ mr: 1 }} />
               )}
-              Delete
+              {selectedLabel ? "Update" : "Create"}
             </Button>
-          )}
-          <Button
-            type="submit"
-            form="label-form"
-            variant="contained"
-            disabled={createMutation.isPending || updateMutation.isPending}
-          >
-            {(createMutation.isPending || updateMutation.isPending) && (
-              <CircularProgress size={20} sx={{ mr: 1 }} />
-            )}
-            {selectedLabel ? "Update" : "Create"}
-          </Button>
-        </DialogActions>
-      </Dialog>
+          </DialogActions>
+        </Dialog>
 
-      {/* Snackbar */}
-      {snackbar && (
-        <Snackbar
-          open
-          autoHideDuration={3000}
-          onClose={() => setSnackbar(null)}
-          anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-        >
-          <Alert
+        {snackbar && (
+          <Snackbar
+            open
+            autoHideDuration={3000}
             onClose={() => setSnackbar(null)}
-            severity={snackbar.severity}
-            sx={{ width: "100%" }}
+            anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
           >
-            {snackbar.message}
-          </Alert>
-        </Snackbar>
-      )}
+            <Alert
+              onClose={() => setSnackbar(null)}
+              severity={snackbar.severity}
+              sx={{ width: "100%" }}
+            >
+              {snackbar.message}
+            </Alert>
+          </Snackbar>
+        )}
 
-      {/* Optional global Backdrop */}
-      <Backdrop
-        open={isMutationLoading}
-        sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}
-      >
-        <CircularProgress color="inherit" />
-      </Backdrop>
-    </Box>
+        <Backdrop
+          open={isMutationLoading}
+          sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        >
+          <CircularProgress color="inherit" />
+        </Backdrop>
+      </Box>
+    </Paper>
   );
 };
 

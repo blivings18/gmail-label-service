@@ -1,4 +1,4 @@
-import { AppBar, Button, Container, Toolbar, Typography } from "@mui/material";
+import { AppBar, Box, Button, Toolbar, Typography } from "@mui/material";
 import { Link, Route, Routes } from "react-router-dom";
 import GoogleAuthGuard from "./components/GoogleAuthGuard";
 import Home from "./pages/Home";
@@ -6,21 +6,19 @@ import LabelsPage from "./pages/LabelsPage";
 
 function App() {
   return (
-    <div>
-      <AppBar position="static">
+    <Box sx={{ width: "100%", minHeight: "100vh" }}>
+      <AppBar position="static" color="primary" elevation={4}>
         <Toolbar>
           <Typography variant="h6" sx={{ flexGrow: 1 }}>
-            Gmail Label App
+            GMAIL
           </Typography>
-          <Button color="inherit" component={Link} to="/">
-            Home
-          </Button>
           <Button color="inherit" component={Link} to="/labels">
             Labels
           </Button>
         </Toolbar>
       </AppBar>
-      <Container sx={{ mt: 4 }}>
+
+      <Box sx={{ mt: 2, width: "100%" }}>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route
@@ -32,8 +30,8 @@ function App() {
             }
           />
         </Routes>
-      </Container>
-    </div>
+      </Box>
+    </Box>
   );
 }
 
