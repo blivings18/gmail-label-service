@@ -1,49 +1,81 @@
 import { createTheme } from "@mui/material/styles";
 import "@mui/x-data-grid/themeAugmentation";
 
+const slate = {
+  50: "#f8fafc",
+  100: "#f1f5f9",
+  200: "#e2e8f0",
+  300: "#cbd5f5",
+  400: "#94a3b8",
+  500: "#64748b",
+  600: "#475569",
+  700: "#334155",
+  800: "#1e293b",
+  900: "#0f172a",
+};
+
+const brand = {
+  main: "#3c9ea8",
+  mainHover: "#2b7f87",
+};
+
 const slateTheme = createTheme({
   palette: {
     mode: "light",
-    primary: {
-      main: "#3c9ea8",
-    },
+    primary: { main: slate[900] },
+    secondary: { main: brand.main },
     text: {
-      primary: "#020617",
-      secondary: "#94a3b8",
+      primary: slate[900],
+      secondary: slate[400],
     },
-    divider: "#334155",
+    divider: slate[200],
+    background: {
+      default: slate[50],
+      paper: "#ffffff",
+    },
   },
 
   typography: {
-    fontFamily: `"Inter", "ui-sans-serif", system-ui`,
-    h6: {
-      fontWeight: 600,
-    },
+    fontFamily: `"Inter", system-ui, sans-serif`,
+    h6: { fontWeight: 600 },
     button: {
       textTransform: "none",
       fontWeight: 500,
     },
   },
 
-  shape: {
-    borderRadius: 10,
-  },
+  shape: { borderRadius: 10 },
 
   components: {
     MuiCssBaseline: {
       styleOverrides: {
-        body: {
-          backgroundColor: "#f9fafb",
-        },
+        body: { backgroundColor: slate[50] },
       },
     },
 
     MuiAppBar: {
       styleOverrides: {
         root: {
-          backgroundColor: "#1f2937",
-          borderBottom: "1px solid #1e293b",
-          boxShadow: "none",
+          borderRadius: 0,
+          backgroundColor: slate[900],
+          color: slate[50],
+          border: "none",
+
+          "& .MuiButton-root": {
+            color: slate[300],
+            padding: "6px 14px",
+            borderRadius: 0,
+
+            "&.active": {
+              color: "#ffffff",
+              borderBottom: `2px solid ${brand.main}`,
+            },
+
+            "&:hover": {
+              color: brand.main,
+              backgroundColor: "transparent",
+            },
+          },
         },
       },
     },
@@ -51,8 +83,7 @@ const slateTheme = createTheme({
     MuiPaper: {
       styleOverrides: {
         root: {
-          backgroundColor: "#ffffffff",
-          border: "1px solid #1e293b",
+          border: `1px solid ${slate[200]}`,
         },
       },
     },
@@ -63,12 +94,10 @@ const slateTheme = createTheme({
           borderRadius: 8,
           padding: "6px 14px",
         },
-        outlined: {
-          borderColor: "#334155",
-          color: "#e2e8f0",
+        text: {
+          color: slate[200],
           "&:hover": {
-            backgroundColor: "#1e293b",
-            borderColor: "#475569",
+            backgroundColor: slate[800],
           },
         },
       },
@@ -77,28 +106,64 @@ const slateTheme = createTheme({
     MuiDataGrid: {
       styleOverrides: {
         root: {
-          boxShadow: "0 1px 2px rgba(0, 0, 0, 0.08)",
+          borderRadius: 10,
+          border: `1px solid ${slate[200]}`,
+          boxShadow:
+            "0 1px 3px rgba(15,23,42,0.08), 0 1px 2px rgba(15,23,42,0.04)",
+          backgroundColor: "#ffffff",
         },
 
         columnHeader: {
-          backgroundColor: "#1e293b",
-          color: "#ffffff",
+          backgroundColor: slate[900],
+          color: slate[100],
+
+          "& .MuiDataGrid-iconButtonContainer": {
+            marginLeft: 8,
+          },
+
+          "& .MuiIconButton-root": {
+            backgroundColor: "transparent",
+            padding: 4,
+            borderRadius: "50%",
+
+            "&:hover": {
+              backgroundColor: "transparent",
+            },
+          },
+
+          "& .MuiDataGrid-sortIcon": {
+            color: brand.main,
+            opacity: 1,
+            fontSize: "1.1rem",
+            transition: "color 0.2s ease",
+
+            "&:hover": {
+              color: brand.mainHover,
+            },
+          },
         },
 
         columnHeaderTitle: {
-          fontWeight: 900,
+          fontWeight: 700,
           textTransform: "uppercase",
-          fontSize: "1rem",
+          fontSize: "0.75rem",
+          letterSpacing: "0.05em",
         },
+
+        columnHeaderTitleContainer: {
+          gap: 8,
+        },
+
         row: {
-          backgroundColor: "#f9fafb",
+          backgroundColor: slate[50],
           "&:hover": {
-            backgroundColor: "#f3f4f6",
+            backgroundColor: slate[100],
             cursor: "pointer",
           },
         },
+
         cell: {
-          borderBottom: "1px solid #e5e7eb",
+          borderBottom: `1px solid ${slate[200]}`,
         },
       },
     },

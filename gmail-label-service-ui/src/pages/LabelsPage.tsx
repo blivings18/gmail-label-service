@@ -1,3 +1,4 @@
+import AddIcon from "@mui/icons-material/Add";
 import {
   Alert,
   Backdrop,
@@ -201,9 +202,16 @@ const LabelsPage: React.FC = () => {
   return (
     <Paper elevation={2} sx={{ m: 4 }}>
       <Box sx={{ p: 4 }}>
-        <Button variant="contained" onClick={handleCreateClick} sx={{ mb: 2 }}>
-          Create Label
-        </Button>
+        <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 2 }}>
+          <Button
+            variant="contained"
+            color="secondary"
+            onClick={handleCreateClick}
+            startIcon={<AddIcon />}
+          >
+            Create Label
+          </Button>
+        </Box>
 
         <Box sx={{ height: "50vh", width: "100%" }}>
           <DataGrid
@@ -212,6 +220,11 @@ const LabelsPage: React.FC = () => {
             getRowId={(row) => row.id}
             onRowClick={handleRowClick}
             disableRowSelectionOnClick
+            initialState={{
+              sorting: {
+                sortModel: [{ field: "name", sort: "asc" }],
+              },
+            }}
           />
         </Box>
 
@@ -294,10 +307,13 @@ const LabelsPage: React.FC = () => {
             </form>
           </DialogContent>
           <DialogActions>
-            <Button onClick={handleClose}>Cancel</Button>
+            <Button variant="outlined" onClick={handleClose}>
+              Cancel
+            </Button>
             {selectedLabel && (
               <Button
                 color="error"
+                variant="contained"
                 onClick={handleDelete}
                 disabled={deleteMutation.isPending}
               >
@@ -326,7 +342,7 @@ const LabelsPage: React.FC = () => {
             open
             autoHideDuration={3000}
             onClose={() => setSnackbar(null)}
-            anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+            anchorOrigin={{ vertical: "top", horizontal: "center" }}
           >
             <Alert
               onClose={() => setSnackbar(null)}

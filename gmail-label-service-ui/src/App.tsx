@@ -1,5 +1,5 @@
 import { AppBar, Box, Button, Toolbar, Typography } from "@mui/material";
-import { Link, Route, Routes } from "react-router-dom";
+import { NavLink, Route, Routes } from "react-router-dom";
 import GoogleAuthGuard from "./components/GoogleAuthGuard";
 import Home from "./pages/Home";
 import LabelsPage from "./pages/LabelsPage";
@@ -12,7 +12,7 @@ function App() {
           <Typography variant="h6" sx={{ flexGrow: 1 }}>
             GMAIL
           </Typography>
-          <Button color="inherit" component={Link} to="/labels">
+          <Button color="inherit" component={NavLink} to="/labels">
             Labels
           </Button>
         </Toolbar>
