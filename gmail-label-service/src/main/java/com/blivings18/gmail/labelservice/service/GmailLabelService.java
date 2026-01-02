@@ -39,7 +39,6 @@ public class GmailLabelService {
     public LabelDto createLabel(LabelDto dto) throws Exception {
         Gmail gmail = gmailServiceFactory.createGmailService();
 
-        // 1. Build domain object (no ID yet)
         Label domainLabel = new Label(
             null,
             dto.name(),
@@ -48,18 +47,15 @@ public class GmailLabelService {
             defaultIfNull(dto.messageListVisibility(), "show")
         );
 
-        // 2. Convert domain → Gmail model
         com.google.api.services.gmail.model.Label gmailLabel =
             GmailLabelConverter.toGmail(domainLabel);
 
-        // 3. Call Gmail API
         com.google.api.services.gmail.model.Label created =
             gmail.users()
                 .labels()
                 .create("me", gmailLabel)
                 .execute();
 
-        // 4. Convert back → domain → DTO
         return GmailLabelConverter.toDomain(created)
                 .map(GmailLabelConverter::toDto)
                 .orElseThrow(() -> new IllegalStateException("Failed to create label"));
@@ -76,7 +72,6 @@ public class GmailLabelService {
             defaultIfNull(dto.messageListVisibility(), "show")
         );
 
-        // 2. Convert domain → Gmail model
         com.google.api.services.gmail.model.Label gmailLabel =
             GmailLabelConverter.toGmail(domainLabel);
 

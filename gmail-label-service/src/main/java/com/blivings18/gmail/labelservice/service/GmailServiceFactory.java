@@ -14,7 +14,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class GmailServiceFactory {
     private static final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
-    // private static final String APPLICATION_NAME = "gmail-label-service-local"; // TODO: Prop?
     private final GoogleOAuthProperties googleOAuthProperties;
     private final GoogleOAuthService googleOAuthService;
 
