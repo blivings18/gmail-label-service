@@ -67,10 +67,4 @@ public class GoogleOAuthController {
         boolean authorized = statusService.isAuthorized();
         return Map.of("authorized", authorized);
     }
-
-    @GetMapping("/status")
-    public Map<String, Boolean> status() throws Exception {
-        boolean authorized = statusService.isAuthorized();
-        return Map.of("authorized", authorized);
-    }
 }
