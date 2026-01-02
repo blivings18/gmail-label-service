@@ -1,18 +1,17 @@
 import { AppBar, Box, Button, Toolbar, Typography } from "@mui/material";
-import { NavLink, Route, Routes } from "react-router-dom";
+import { Navigate, NavLink, Route, Routes } from "react-router-dom";
 import GoogleAuthGuard from "./components/GoogleAuthGuard";
-import Home from "./pages/Home";
-import LabelsPage from "./pages/LabelsPage";
+import LabelsPage from "./features/labels/LabelsPage";
 
 function App() {
   return (
     <Box sx={{ width: "100%", minHeight: "100vh" }}>
       <AppBar position="static" color="primary" elevation={4}>
         <Toolbar>
-          <Typography variant="h6" sx={{ flexGrow: 1 }}>
-            GMAIL
+          <Typography variant="h5" sx={{ flexGrow: 1 }}>
+            Gmail
           </Typography>
-          <Button color="inherit" component={NavLink} to="/labels">
+          <Button component={NavLink} to="/labels" sx={{ fontSize: "1rem" }}>
             Labels
           </Button>
         </Toolbar>
@@ -20,7 +19,7 @@ function App() {
 
       <Box sx={{ mt: 2, width: "100%" }}>
         <Routes>
-          <Route path="/" element={<Home />} />
+          <Route path="/" element={<Navigate to="/labels" replace />} />
           <Route
             path="/labels"
             element={

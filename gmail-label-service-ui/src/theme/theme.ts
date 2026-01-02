@@ -15,15 +15,17 @@ const slate = {
 };
 
 const brand = {
-  main: "#3c9ea8",
-  mainHover: "#2b7f87",
+  elegantNavy: "#233266",
+  elegantNavyHover: "#1f2a57",
+  mediumAquamarine: "#6fc6ac",
+  mediumAquamarineHover: "#59b89b",
 };
 
 const slateTheme = createTheme({
   palette: {
     mode: "light",
-    primary: { main: slate[900] },
-    secondary: { main: brand.main },
+    primary: { main: brand.elegantNavy },
+    secondary: { main: brand.mediumAquamarine },
     text: {
       primary: slate[900],
       secondary: slate[400],
@@ -57,22 +59,20 @@ const slateTheme = createTheme({
       styleOverrides: {
         root: {
           borderRadius: 0,
-          backgroundColor: slate[900],
+          backgroundColor: brand.elegantNavy,
           color: slate[50],
           border: "none",
 
           "& .MuiButton-root": {
-            color: slate[300],
-            padding: "6px 14px",
             borderRadius: 0,
 
             "&.active": {
               color: "#ffffff",
-              borderBottom: `2px solid ${brand.main}`,
+              borderBottom: `2px solid ${brand.mediumAquamarine}`,
             },
 
             "&:hover": {
-              color: brand.main,
+              color: brand.mediumAquamarine,
               backgroundColor: "transparent",
             },
           },
@@ -93,6 +93,21 @@ const slateTheme = createTheme({
         root: {
           borderRadius: 8,
           padding: "6px 14px",
+          fontWeight: "bold",
+        },
+        containedPrimary: {
+          backgroundColor: brand.elegantNavy,
+          color: "#ffffff",
+          "&:hover": {
+            backgroundColor: brand.elegantNavyHover,
+          },
+        },
+        containedSecondary: {
+          backgroundColor: brand.mediumAquamarine,
+          color: "#ffffff",
+          "&:hover": {
+            backgroundColor: brand.mediumAquamarineHover,
+          },
         },
         text: {
           color: slate[200],
@@ -111,10 +126,11 @@ const slateTheme = createTheme({
           boxShadow:
             "0 1px 3px rgba(15,23,42,0.08), 0 1px 2px rgba(15,23,42,0.04)",
           backgroundColor: "#ffffff",
+          fontSize: "1rem",
         },
 
         columnHeader: {
-          backgroundColor: slate[900],
+          backgroundColor: brand.elegantNavy,
           color: slate[100],
 
           "& .MuiDataGrid-iconButtonContainer": {
@@ -132,13 +148,13 @@ const slateTheme = createTheme({
           },
 
           "& .MuiDataGrid-sortIcon": {
-            color: brand.main,
+            color: brand.mediumAquamarine,
             opacity: 1,
             fontSize: "1.1rem",
             transition: "color 0.2s ease",
 
             "&:hover": {
-              color: brand.mainHover,
+              color: brand.mediumAquamarineHover,
             },
           },
         },
@@ -146,7 +162,7 @@ const slateTheme = createTheme({
         columnHeaderTitle: {
           fontWeight: 700,
           textTransform: "uppercase",
-          fontSize: "0.75rem",
+          fontSize: "1rem",
           letterSpacing: "0.05em",
         },
 
