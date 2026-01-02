@@ -6,19 +6,9 @@ This project is currently configured for **local development** using Google OAut
 
 ---
 
-## Tech Stack
-
-- Java 17+
-- Spring Boot
-- Google Gmail API
-- Google OAuth 2.0
-- Maven
-
----
-
 ## Prerequisites
 
-- Java 17 or newer
+- Java 17+
 - Maven
 - A Google account
 - Access to Google Cloud Console
@@ -53,8 +43,6 @@ This project is currently configured for **local development** using Google OAut
 4. Add the scope:
    `https://www.googleapis.com/auth/gmail.labels`
 5. Save and continue
-
-> ⚠️ While in _Testing_ mode, only approved test users can authenticate.
 
 ---
 
@@ -107,18 +95,4 @@ The application will start on:
 
 ```
  http://localhost:8080
-```
-
-### OAuth Flow
-
-1. Hit the authorization endpoint in your browser
-2. Sign in with Google
-3. Grant Gmail permissions
-4. Google redirects back to the application
-5. OAuth tokens are stored locally in the tokens/ directory
-
-If successful, you will see:
-
-```
-OAuth successful ✅ You can close this window.
 ```

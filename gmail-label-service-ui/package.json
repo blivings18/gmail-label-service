@@ -8,6 +8,7 @@
     "@mui/icons-material": "^7.3.6",
     "@mui/lab": "^7.0.1-beta.20",
     "@mui/material": "^7.3.6",
+    "@mui/x-data-grid": "^8.23.0",
     "@tanstack/react-query": "^5.90.12",
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.9.1",

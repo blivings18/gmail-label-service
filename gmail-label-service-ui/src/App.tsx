@@ -1,36 +1,36 @@
-import { AppBar, Button, Container, Toolbar, Typography } from "@mui/material";
-import { Link, Route, Routes } from "react-router-dom";
-import FormPage from "./pages/FormPage";
-import Home from "./pages/Home";
-import LabelsPage from "./pages/LabelsPage";
+import { AppBar, Box, Button, Toolbar, Typography } from "@mui/material";
+import { Navigate, NavLink, Route, Routes } from "react-router-dom";
+import GoogleAuthGuard from "./components/GoogleAuthGuard";
+import LabelsPage from "./features/labels/LabelsPage";
 
 function App() {
   return (
-    <div>
-      <AppBar position="static">
+    <Box sx={{ width: "100%", minHeight: "100vh" }}>
+      <AppBar position="static" color="primary" elevation={4}>
         <Toolbar>
-          <Typography variant="h6" sx={{ flexGrow: 1 }}>
-            My App
+          <Typography variant="h5" sx={{ flexGrow: 1 }}>
+            Gmail
           </Typography>
-          <Button color="inherit" component={Link} to="/">
-            Home
-          </Button>
-          <Button color="inherit" component={Link} to="/form">
-            Form
-          </Button>
-          <Button color="inherit" component={Link} to="/labels">
+          <Button component={NavLink} to="/labels" sx={{ fontSize: "1rem" }}>
             Labels
           </Button>
         </Toolbar>
       </AppBar>
-      <Container sx={{ mt: 4 }}>
+
+      <Box sx={{ mt: 2, width: "100%" }}>
         <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/form" element={<FormPage />} />
-          <Route path="/labels" element={<LabelsPage />} />
+          <Route path="/" element={<Navigate to="/labels" replace />} />
+          <Route
+            path="/labels"
+            element={
+              <GoogleAuthGuard>
+                <LabelsPage />
+              </GoogleAuthGuard>
+            }
+          />
         </Routes>
-      </Container>
-    </div>
+      </Box>
+    </Box>
   );
 }
 

@@ -13,6 +13,7 @@ import com.blivings18.gmail.labelservice.service.GoogleOAuthStatusService;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
 import com.google.api.client.googleapis.auth.oauth2.GoogleTokenResponse;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
@@ -25,18 +26,23 @@ public class GoogleOAuthController {
     private final GoogleOAuthProperties googleOAuthProperties;
 
     @GetMapping("/authorize")
-    public void authorize(HttpServletResponse response) throws Exception {
+    public void authorize(@RequestParam(value = "redirect", required = false) String redirectUrl, HttpServletRequest request, HttpServletResponse response) throws Exception {
         GoogleAuthorizationCodeFlow flow = oAuthService.authorizationCodeFlow();
 
         String url = flow.newAuthorizationUrl()
                 .setRedirectUri("http://localhost:8080/api/v1/google/oauth/callback")
                 .build();
 
+        // Store redirectUrl in session or temporary store so callback knows where to go
+        request.getSession().setAttribute("redirectUrl", redirectUrl);
+
         response.sendRedirect(url);
     }
 
     @GetMapping("/callback")
-    public String callback(@RequestParam("code") String code) throws Exception {
+    public void callback(@RequestParam("code") String code,
+                        HttpServletRequest request,
+                        HttpServletResponse response) throws Exception {
         GoogleAuthorizationCodeFlow flow = oAuthService.authorizationCodeFlow();
 
         GoogleTokenResponse tokenResponse = flow
@@ -46,7 +52,14 @@ public class GoogleOAuthController {
 
         flow.createAndStoreCredential(tokenResponse, googleOAuthProperties.getCredentialUserId());
 
-        return "OAuth successful ✅ You can close this window.";
+        // Retrieve redirect URL stored in session
+        String redirectUrl = (String) request.getSession().getAttribute("redirectUrl");
+
+        if (redirectUrl == null || redirectUrl.isBlank()) {
+            redirectUrl = "http://localhost:3000/"; // fallback
+        }
+
+        response.sendRedirect(redirectUrl);
     }
 
     @GetMapping("/status")
